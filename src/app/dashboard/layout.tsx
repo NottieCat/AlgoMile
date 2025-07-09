@@ -46,6 +46,15 @@ import { ThemeToggle } from "@/components/theme-toggle"
 
 type UserRole = "customer" | "driver" | "retailer"
 
+function getCookie(name: string): string | undefined {
+    if (typeof document === 'undefined') {
+        return undefined;
+    }
+    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
+    if (match) return match[2];
+    return undefined;
+}
+
 const navItems: Record<UserRole, { href: string; label: string; icon: React.ElementType }[]> = {
   customer: [
     { href: "/dashboard", label: "Dashboard", icon: BarChart },
@@ -75,9 +84,10 @@ function UserNav({ userRole }: { userRole: UserRole }) {
     const router = useRouter();
     const user = userDetails[userRole];
 
-    const handleLogout = () => {
-        localStorage.removeItem('userRole');
+    const handleLogout = async () => {
+        await fetch('/api/auth/logout', { method: 'POST' });
         router.push('/login');
+        router.refresh();
     };
 
     return (
@@ -128,7 +138,7 @@ export default function DashboardLayout({
   const [userRole, setUserRole] = React.useState<UserRole | null>(null)
 
   React.useEffect(() => {
-    const storedRole = localStorage.getItem("userRole") as UserRole
+    const storedRole = getCookie("userRole") as UserRole
     if (storedRole && ["customer", "driver", "retailer"].includes(storedRole)) {
       setUserRole(storedRole)
     } else {

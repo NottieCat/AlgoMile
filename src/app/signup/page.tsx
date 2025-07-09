@@ -32,11 +32,13 @@ import { Logo } from "@/components/logo"
 
 const formSchema = z.object({
   email: z.string().email({ message: "Please enter a valid email." }),
-  password: z.string().min(1, { message: "Password is required." }),
+  password: z
+    .string()
+    .min(6, { message: "Password must be at least 6 characters." }),
   role: z.enum(["customer", "driver", "retailer"]),
 })
 
-export default function LoginPage() {
+export default function SignupPage() {
   const router = useRouter()
   const { toast } = useToast()
   const [isLoading, setIsLoading] = React.useState(false)
@@ -53,7 +55,7 @@ export default function LoginPage() {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true)
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -66,19 +68,20 @@ export default function LoginPage() {
       if (!response.ok) {
         throw new Error(data.message || "Something went wrong")
       }
-      
-      // Force a full page reload to ensure cookies are set before dashboard loads.
-      // This prevents the race condition with client-side routing.
-      window.location.assign('/dashboard');
-      
+
+      toast({
+        title: "Account Created",
+        description: "Your account has been created successfully. Please log in.",
+      })
+      router.push("/login")
     } catch (error) {
       toast({
         variant: "destructive",
-        title: "Login Failed",
+        title: "Signup Failed",
         description:
           error instanceof Error ? error.message : "An unknown error occurred.",
       })
-      // Only set loading to false on error, as success will navigate away.
+    } finally {
       setIsLoading(false)
     }
   }
@@ -93,8 +96,8 @@ export default function LoginPage() {
           <div className="flex justify-center mb-4">
             <Logo />
           </div>
-          <CardTitle className="text-2xl font-headline">Welcome Back</CardTitle>
-          <CardDescription>Sign in to your portal.</CardDescription>
+          <CardTitle className="text-2xl font-headline">Create an Account</CardTitle>
+          <CardDescription>Get started with AlgoMile today.</CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -190,17 +193,17 @@ export default function LoginPage() {
               />
               <Button type="submit" className="w-full" disabled={isLoading}>
                 {isLoading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                Sign In
+                Create Account
               </Button>
             </form>
           </Form>
           <p className="mt-4 text-center text-sm text-muted-foreground">
-            Don't have an account?{" "}
+            Already have an account?{" "}
             <Link
-              href="/signup"
+              href="/login"
               className="underline underline-offset-4 hover:text-primary"
             >
-              Sign up
+              Log in
             </Link>
           </p>
         </CardContent>

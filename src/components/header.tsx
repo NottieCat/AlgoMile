@@ -59,8 +59,11 @@ export function Header() {
         </nav>
         <div className="hidden items-center gap-2 md:flex">
           <ThemeToggle />
-          <Button asChild>
+          <Button variant="outline" asChild>
             <Link href="/login" aria-label="Login">Login</Link>
+          </Button>
+           <Button asChild>
+            <Link href="/signup" aria-label="Sign Up">Sign Up</Link>
           </Button>
         </div>
         <div className="flex items-center gap-2 md:hidden">
@@ -89,9 +92,14 @@ export function Header() {
                     {label}
                 </Link>
                 ))}
-                <Button asChild size="lg">
-                    <Link href="/login" aria-label="Login">Login</Link>
-                </Button>
+                <div className="flex flex-col w-full max-w-xs gap-4">
+                  <Button asChild size="lg" variant="outline">
+                      <Link href="/login" onClick={() => setMobileMenuOpen(false)} aria-label="Login">Login</Link>
+                  </Button>
+                  <Button asChild size="lg">
+                      <Link href="/signup" onClick={() => setMobileMenuOpen(false)} aria-label="Sign Up">Sign Up</Link>
+                  </Button>
+                </div>
             </div>
         </div>
       )}
