@@ -1,9 +1,9 @@
 'use server';
 
 /**
- * @fileOverview Dynamic route optimization flow using Genkit.
+ * @fileOverview Dynamic route optimization AI agent.
  *
- * - optimizeRoute - A function that takes in shipment details, traffic, and weather conditions to optimize delivery routes in real-time.
+ * - optimizeRoute - A function that handles the route optimization process.
  * - OptimizeRouteInput - The input type for the optimizeRoute function.
  * - OptimizeRouteOutput - The return type for the optimizeRoute function.
  */
@@ -12,19 +12,20 @@ import {ai} from '@/ai/genkit';
 import {z} from 'genkit';
 
 const OptimizeRouteInputSchema = z.object({
-  shipmentDetails: z.string().describe('Details of the shipment including origin, destination, and any specific requirements.'),
-  trafficConditions: z.string().describe('Current traffic conditions including congestion levels and estimated delays.'),
-  weatherConditions: z.string().describe('Current weather conditions including rain, snow, or any other relevant weather phenomena.'),
+  deliveryAddress: z.string().describe('The delivery address.'),
+  optimizeFor: z.enum(['time', 'cost']).describe('Whether to optimize for time or cost.'),
+  currentTrafficConditions: z.string().optional().describe('Current traffic conditions.'),
+  currentWeatherConditions: z.string().optional().describe('Current weather conditions.'),
+  orderPriority: z.string().optional().describe('The priority of the order.'),
 });
-
 export type OptimizeRouteInput = z.infer<typeof OptimizeRouteInputSchema>;
 
 const OptimizeRouteOutputSchema = z.object({
-  optimizedRoute: z.string().describe('The optimized delivery route considering traffic and weather conditions.'),
-  estimatedTimeOfArrival: z.string().describe('The estimated time of arrival based on the optimized route.'),
-  potentialDelays: z.string().describe('Any potential delays and their causes based on current conditions.'),
+  optimizedRoute: z.string().describe('The optimized delivery route.'),
+  estimatedDeliveryTime: z.string().describe('The estimated delivery time.'),
+  estimatedDeliveryCost: z.string().describe('The estimated delivery cost.'),
+  routeSummary: z.string().describe('A summary of the optimized route.'),
 });
-
 export type OptimizeRouteOutput = z.infer<typeof OptimizeRouteOutputSchema>;
 
 export async function optimizeRoute(input: OptimizeRouteInput): Promise<OptimizeRouteOutput> {
@@ -35,15 +36,21 @@ const prompt = ai.definePrompt({
   name: 'optimizeRoutePrompt',
   input: {schema: OptimizeRouteInputSchema},
   output: {schema: OptimizeRouteOutputSchema},
-  prompt: `You are an expert logistics optimizer. Given the shipment details, traffic conditions, and weather conditions, determine the optimal delivery route.
+  prompt: `You are an AI assistant specializing in optimizing delivery routes.
 
-Shipment Details: {{{shipmentDetails}}}
-Traffic Conditions: {{{trafficConditions}}}
-Weather Conditions: {{{weatherConditions}}}
+You will receive the delivery address, the optimization preference (time or cost), 
+current traffic conditions, current weather conditions, and the order priority.
 
-Consider all factors to provide the fastest and most efficient route, along with an estimated time of arrival and any potential delays.
+Based on this information, you will generate an optimized delivery route, estimate the delivery time and cost, and provide a summary of the route.
 
-Optimize the route and estimate the arrival time, considering potential delays. Return all information in a clear and concise manner.`, 
+Delivery Address: {{{deliveryAddress}}}
+Optimize For: {{{optimizeFor}}}
+Current Traffic Conditions: {{{currentTrafficConditions}}}
+Current Weather Conditions: {{{currentWeatherConditions}}}
+Order Priority: {{{orderPriority}}}
+
+Consider real-time factors such as traffic and weather to minimize either delivery time or cost based on the optimizeFor parameter. Always provide a routeSummary.
+`,
 });
 
 const optimizeRouteFlow = ai.defineFlow(

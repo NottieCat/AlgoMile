@@ -1,83 +1,55 @@
-"use client"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Button } from "@/components/ui/button";
 
-import * as React from "react"
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
-import { Button } from "@/components/ui/button"
-import Link from "next/link"
-import { ArrowRight } from "lucide-react"
-
-type UserRole = "customer" | "driver" | "retailer"
-
-function getCookie(name: string): string | undefined {
-    if (typeof document === 'undefined') {
-        return undefined;
-    }
-    const match = document.cookie.match(new RegExp('(^| )' + name + '=([^;]+)'));
-    if (match) return match[2];
-    return undefined;
-}
-
-const roleDetails = {
-    customer: {
-        title: "Welcome, Customer!",
-        description: "Manage your shipments, track deliveries, and analyze performance.",
-        quickLinks: [
-            { href: "/dashboard/customer", label: "Start Shopping" },
-            { href: "/dashboard/customer/orders", label: "View My Orders" },
-        ]
-    },
-    driver: {
-        title: "Welcome, Driver!",
-        description: "Find new jobs, view your route for the day, and track your earnings.",
-        quickLinks: [
-            { href: "/dashboard/driver", label: "Go to Driver Dashboard" },
-            { href: "/dashboard/driver/earnings", label: "Check Earnings" },
-        ]
-    },
-    retailer: {
-        title: "Welcome, Retailer!",
-        description: "Manage bulk orders, sync your inventory, and view performance KPIs.",
-        quickLinks: [
-            { href: "/dashboard/retailer", label: "Go to Retailer Dashboard" },
-            { href: "/dashboard/retailer/inventory", label: "Sync Inventory" },
-        ]
-    },
-}
-
-export default function DashboardPage() {
-    // The layout already protects this route. We can read the cookie directly.
-    // This avoids the "Loading..." flicker caused by useEffect and useState.
-    const userRole = getCookie("userRole") as UserRole | undefined
-
-    if (!userRole || !roleDetails[userRole]) {
-        // This state should be brief, as the layout will redirect if the cookie is invalid.
-        return <div>Loading dashboard...</div>
-    }
-
-    const details = roleDetails[userRole];
-
+const DashboardPage = () => {
     return (
-        <div className="flex flex-col gap-8">
-            <div className="space-y-2">
-                <h1 className="text-3xl font-bold tracking-tight font-headline">{details.title}</h1>
-                <p className="text-muted-foreground">{details.description}</p>
+        <div className="container mx-auto py-28 px-4 md:px-6">
+            <div className="space-y-4 mb-8">
+                <h1 className="text-4xl font-bold font-headline">Customer Dashboard</h1>
+                <p className="text-muted-foreground">Manage your orders and optimize deliveries.</p>
             </div>
-            <Card>
-                <CardHeader>
-                    <CardTitle>Quick Actions</CardTitle>
-                    <CardDescription>Get started with your most common tasks.</CardDescription>
-                </CardHeader>
-                <CardContent className="grid gap-4 sm:grid-cols-2">
-                    {details.quickLinks.map(link => (
-                        <Button asChild key={link.href} variant="outline" className="justify-between h-12">
-                            <Link href={link.href}>
-                                {link.label}
-                                <ArrowRight className="h-4 w-4" />
-                            </Link>
-                        </Button>
-                    ))}
-                </CardContent>
-            </Card>
+            
+            <div className="grid gap-8 md:grid-cols-2 lg:grid-cols-3">
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>Create New Delivery</CardTitle>
+                        <CardDescription>Enter delivery details and let our AI find the best route.</CardDescription>
+                    </CardHeader>
+                    <CardContent className="space-y-4">
+                        {/* A proper form would go here using react-hook-form */}
+                        <div>
+                            <label htmlFor="address" className="block text-sm font-medium text-muted-foreground mb-1">Delivery Address</label>
+                            <input id="address" type="text" placeholder="123 Main St, Anytown, USA" className="w-full p-2 rounded-md bg-input border border-border" />
+                        </div>
+                        <div className="flex gap-4">
+                            <Button className="flex-1">Optimize for Time</Button>
+                            <Button variant="secondary" className="flex-1">Optimize for Cost</Button>
+                        </div>
+                    </CardContent>
+                </Card>
+
+                 <Card>
+                    <CardHeader>
+                        <CardTitle>Time & Cost Analytics</CardTitle>
+                        <CardDescription>Review your savings and performance.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground">Analytics charts and KPIs would be displayed here.</p>
+                    </CardContent>
+                </Card>
+
+                <Card>
+                    <CardHeader>
+                        <CardTitle>Recent Orders</CardTitle>
+                        <CardDescription>A list of your recent order shipments.</CardDescription>
+                    </CardHeader>
+                    <CardContent>
+                        <p className="text-muted-foreground">Order history would be displayed here.</p>
+                    </CardContent>
+                </Card>
+            </div>
         </div>
-    )
-}
+    );
+};
+
+export default DashboardPage;
