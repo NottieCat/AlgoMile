@@ -12,6 +12,24 @@ export const metadata: Metadata = {
   description: "AI-powered dynamic vehicle routing for warehouse-to-customer delivery.",
 }
 
+function ConditionalLayout({ children, pathname }: { children: React.ReactNode; pathname?: string }) {
+  // Don't show header/footer for retailer, driver, or other dashboard pages
+  const isDashboardPage =
+    pathname?.startsWith("/retailer") || pathname?.startsWith("/driver") || pathname?.startsWith("/dashboard")
+
+  if (isDashboardPage) {
+    return <>{children}</>
+  }
+
+  return (
+    <>
+      <Header />
+      <main className="flex-1">{children}</main>
+      <Footer />
+    </>
+  )
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -30,9 +48,7 @@ export default function RootLayout({
       </head>
       <body className={cn("font-body antialiased")}>
         <CartProvider>
-          <Header />
-          <main className="flex-1">{children}</main>
-          <Footer />
+          <ConditionalLayout>{children}</ConditionalLayout>
           <Toaster />
         </CartProvider>
       </body>
