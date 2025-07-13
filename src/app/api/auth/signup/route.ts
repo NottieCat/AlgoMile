@@ -7,10 +7,14 @@ export async function POST(req: NextRequest) {
   await dbConnect();
 
   try {
-    const { fullName, email, password } = await req.json();
+    const { fullName, email, password, role } = await req.json();
 
-    if (!fullName || !email || !password) {
+    if (!fullName || !email || !password || !role) {
       return NextResponse.json({ message: 'All fields are required' }, { status: 400 });
+    }
+
+    if (!['customer', 'retailer', 'driver'].includes(role)) {
+        return NextResponse.json({ message: 'Invalid role' }, { status: 400 });
     }
 
     const existingUser = await User.findOne({ email });
@@ -24,6 +28,7 @@ export async function POST(req: NextRequest) {
       fullName,
       email,
       passwordHash,
+      role,
     });
 
     await newUser.save();

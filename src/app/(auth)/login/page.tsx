@@ -42,7 +42,21 @@ export default function LoginPage() {
         title: "Success",
         description: "Logged in successfully!",
       });
-      router.push('/dashboard');
+
+      // Redirect based on role
+      switch (data.role) {
+        case 'customer':
+          router.push('/dashboard');
+          break;
+        case 'retailer':
+          router.push('/retailer');
+          break;
+        case 'driver':
+          router.push('/driver');
+          break;
+        default:
+          router.push('/dashboard'); // Default redirect
+      }
       router.refresh(); // Refresh to update server-side state
     } else {
       toast({

@@ -30,11 +30,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: 'Invalid credentials' }, { status: 401 });
     }
 
-    const token = jwt.sign({ userId: user._id }, JWT_SECRET, {
+    const token = jwt.sign({ userId: user._id, role: user.role }, JWT_SECRET, {
       expiresIn: '1d',
     });
 
-    const response = NextResponse.json({ message: 'Logged in successfully' }, { status: 200 });
+    const response = NextResponse.json({ 
+        message: 'Logged in successfully',
+        role: user.role 
+    }, { status: 200 });
 
     response.cookies.set('token', token, {
       httpOnly: true,
