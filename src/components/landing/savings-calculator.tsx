@@ -13,30 +13,38 @@ const SavingsCalculator = () => {
   const [fleetSize, setFleetSize] = useState(10);
 
   const { hoursSaved, moneySaved } = useMemo(() => {
-    if (dailyOrders <= 0 || fleetSize <= 0) return { hoursSaved: 0, moneySaved: 0 };
+    if (dailyOrders <= 0 || fleetSize <= 0)
+      return { hoursSaved: 0, moneySaved: 0 };
 
-    const H = 0.30; // hours per stop
-    const TR = 0.20; // 20% time reduction
-    const DPM = 30; // days per month
-    const DC = 25; // $/hour
-    const MPS = 1.2; // miles per stop
-    const MR = 0.15; // 15% miles cut
-    const FC = 0.80; // $/mile
+    // constants
+    const H = 0.30;   // hours per stop
+    const TR = 0.20;  // 20% time reduction
+    const DPM = 30;   // days per month
+    const DC = 25;    // $ per labor hour
+    const MPS = 1.2;  // miles per stop
+    const MR = 0.15;  // 15% miles reduction
+    const FC = 0.80;  // $ per mile
 
-    const ordersPerVehicle = dailyOrders / fleetSize;
-    const hoursSavedPerDay = ordersPerVehicle * H * TR * fleetSize;
-    const calculatedHoursSaved = hoursSavedPerDay * DPM;
+    // total hours saved across the whole fleet
+    const hoursSavedPerMonth = dailyOrders * H * TR * DPM;
 
-    const labourSaved = calculatedHoursSaved * DC;
-    const baseMiles = dailyOrders * MPS * DPM;
-    const milesSaved = baseMiles * MR;
-    const fuelSaved = milesSaved * FC;
+    // total labor savings
+    const laborSaved = hoursSavedPerMonth * DC;
 
-    const calculatedMoneySaved = labourSaved + fuelSaved;
+    // total fuel savings
+    const fuelSaved =
+      dailyOrders * MPS * MR * DPM * FC;
 
-    return { hoursSaved: calculatedHoursSaved, moneySaved: calculatedMoneySaved };
+    // if you want to scale by fleet size as "number of optimized vehicles",
+    // simply multiply both totals by fleetSize:
+    const totalHoursSaved = hoursSavedPerMonth * fleetSize;
+    const totalMoneySaved = (laborSaved + fuelSaved) * fleetSize;
+
+    return {
+      hoursSaved: totalHoursSaved,
+      moneySaved: totalMoneySaved,
+    };
   }, [dailyOrders, fleetSize]);
-
 
   return (
     <section id="calculator" className="py-20 md:py-28">
@@ -74,7 +82,11 @@ const SavingsCalculator = () => {
                   max={100}
                   step={1}
                   value={[fleetSize]}
-                  onValueChange={(value) => setFleetSize(value[0])}
+                  onValueChange={(value) =>{
+                     console.log("fleet-size change:", value[0]);
+                    setFleetSize(value[0]);
+                  } }
+                   
                   aria-label="Fleet Size"
                 />
               </div>
