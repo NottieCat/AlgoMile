@@ -12,8 +12,7 @@ import { Menu, X } from 'lucide-react';
 const navLinks = [
   { href: '#features', label: 'Features' },
   { href: '#calculator', label: 'Calculator' },
-  { href: '#testimonials', label: 'Testimonials' },
-  { href: '#pricing', label: 'Pricing' },
+  { href: '#about-us', label: 'About Us' },
 ];
 
 const Header = () => {
