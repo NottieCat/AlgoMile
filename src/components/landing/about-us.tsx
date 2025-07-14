@@ -6,23 +6,20 @@ const teamMembers = [
     name: "Akshat Jain",
     role: "CEO & Co-Founder",
     image: "/images/akshatspic.jpeg",
-    description: "Former logistics executive with 15+ years optimizing supply chains for Fortune 500 companies.",
-    aiHint: "professional woman CEO",
+    description: "Problem-solving leader leveraging algorithms to optimize logistics, supply chains, and operations."
   },
   {
     name: "Nishit Tomar",
     role: "CTO & Co-Founder",
     image: "/images/nishitspic.jpeg",
-    description: "AI researcher and engineer who previously led routing algorithms at major tech companies.",
-    aiHint: "professional man CTO",
+    description: "AI engineer who solves real-world problems using logic, code, and smart routing algorithms."
   },
   {
     name: "Raj Bathla",
-    role: "Head of Product",
+    role: "CFO & Co-Founder",
     image: "/images/rajspic.jpeg",
     description:
-      "Product strategist passionate about creating user-centric solutions for complex logistics challenges.",
-    aiHint: "professional woman product manager",
+      "Product strategist passionate about creating user-centric solutions for complex logistics challenges."
   },
 ]
 
@@ -47,7 +44,6 @@ const AboutUs = () => {
                     alt={member.name}
                     fill
                     className="object-cover"
-                    data-ai-hint={member.aiHint}
                   />
                 </div>
                 <CardTitle className="font-headline text-xl">{member.name}</CardTitle>
