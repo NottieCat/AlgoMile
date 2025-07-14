@@ -8,6 +8,8 @@ import Logo from "@/components/logo"
 import { Button } from "@/components/ui/button"
 import { DarkModeToggle } from "@/components/dark-mode-toggle"
 import { CartSidebar } from "@/components/cart/cart-sidebar"
+import { useAuth } from "@/hooks/use-auth"
+import { usePathname } from "next/navigation"
 import { Menu, X } from "lucide-react"
 
 const navLinks = [
@@ -21,12 +23,31 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false)
   const [isMenuOpen, setIsMenuOpen] = useState(false)
   const { scrollY } = useScroll()
+  const { user, logout } = useAuth()
+  const pathname = usePathname()
+
+  // Only show cart for customers and on customer-related pages
+  const shouldShowCart = user?.role === "customer" || pathname === "/products"
 
   useEffect(() => {
     return scrollY.onChange((latest) => {
       setIsScrolled(latest > 50)
     })
   }, [scrollY])
+
+  const getDashboardLink = () => {
+    if (!user) return "/dashboard"
+
+    switch (user.role) {
+      case "retailer":
+        return "/retailer"
+      case "driver":
+        return "/driver"
+      case "customer":
+      default:
+        return "/dashboard"
+    }
+  }
 
   return (
     <motion.header
@@ -51,17 +72,31 @@ const Header = () => {
           ))}
         </nav>
         <div className="hidden md:flex items-center gap-2">
-          <CartSidebar />
+          {shouldShowCart && <CartSidebar />}
           <DarkModeToggle />
-          <Button variant="ghost" asChild>
-            <Link href="/login">Login</Link>
-          </Button>
-          <Button asChild>
-            <Link href="/signup">Sign Up</Link>
-          </Button>
+          {user ? (
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-muted-foreground">Welcome, {user.fullName || "User"}</span>
+              <Button variant="ghost" onClick={logout}>
+                Logout
+              </Button>
+              <Button asChild>
+                <Link href={getDashboardLink()}>Dashboard</Link>
+              </Button>
+            </div>
+          ) : (
+            <>
+              <Button variant="ghost" asChild>
+                <Link href="/login">Login</Link>
+              </Button>
+              <Button asChild>
+                <Link href="/signup">Sign Up</Link>
+              </Button>
+            </>
+          )}
         </div>
         <div className="md:hidden flex items-center gap-2">
-          <CartSidebar />
+          {shouldShowCart && <CartSidebar />}
           <DarkModeToggle />
           <Button variant="ghost" size="icon" onClick={() => setIsMenuOpen(!isMenuOpen)}>
             {isMenuOpen ? <X /> : <Menu />}
@@ -88,16 +123,39 @@ const Header = () => {
               </Link>
             ))}
             <div className="flex flex-col gap-4 w-full px-4 mt-4">
-              <Button variant="outline" asChild className="w-full bg-transparent">
-                <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                  Login
-                </Link>
-              </Button>
-              <Button asChild className="w-full">
-                <Link href="/signup" onClick={() => setIsMenuOpen(false)}>
-                  Sign Up
-                </Link>
-              </Button>
+              {user ? (
+                <>
+                  <span className="text-center text-sm text-muted-foreground">Welcome, {user.fullName || "User"}</span>
+                  <Button asChild className="w-full">
+                    <Link href={getDashboardLink()} onClick={() => setIsMenuOpen(false)}>
+                      Dashboard
+                    </Link>
+                  </Button>
+                  <Button
+                    variant="outline"
+                    onClick={() => {
+                      logout()
+                      setIsMenuOpen(false)
+                    }}
+                    className="w-full bg-transparent"
+                  >
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Button variant="outline" asChild className="w-full bg-transparent">
+                    <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                      Login
+                    </Link>
+                  </Button>
+                  <Button asChild className="w-full">
+                    <Link href="/signup" onClick={() => setIsMenuOpen(false)}>
+                      Sign Up
+                    </Link>
+                  </Button>
+                </>
+              )}
             </div>
           </nav>
         </motion.div>

@@ -5,7 +5,7 @@ import { useState, useEffect } from "react"
 import { cn } from "@/lib/utils"
 import { Button } from "@/components/ui/button"
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet"
-import { Package, BarChart3, Settings, Truck, Menu, LogOut, User, Bell } from "lucide-react"
+import { Truck, MapPin, DollarSign, Menu, LogOut, User, Bell } from "lucide-react"
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
@@ -21,15 +21,13 @@ import {
 } from "@/components/ui/dropdown-menu"
 
 const navigation = [
-  { name: "Shipments", href: "/retailer", icon: Truck },
-  { name: "Inventory", href: "/retailer/inventory", icon: Package },
-  { name: "Performance", href: "/retailer/performance", icon: BarChart3 },
-  { name: "Integration Settings", href: "/retailer/settings", icon: Settings, adminOnly: true },
+  { name: "Dashboard", href: "/driver", icon: MapPin },
+  { name: "Available Jobs", href: "/driver/jobs", icon: Truck },
+  { name: "Earnings", href: "/driver/earnings", icon: DollarSign },
 ]
 
 function Sidebar({ className }: { className?: string }) {
   const pathname = usePathname()
-  const { user } = useAuth()
 
   return (
     <div className={cn("pb-12 min-h-screen", className)}>
@@ -39,15 +37,10 @@ function Sidebar({ className }: { className?: string }) {
             <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
               <Truck className="w-4 h-4 text-primary-foreground" />
             </div>
-            <h2 className="text-lg font-semibold">Retailer Portal</h2>
+            <h2 className="text-lg font-semibold">Driver Portal</h2>
           </div>
           <div className="space-y-1">
             {navigation.map((item) => {
-              // Hide admin-only items for non-admin users
-              if (item.adminOnly && user?.role !== "admin") {
-                return null
-              }
-
               const isActive = pathname === item.href
               return (
                 <Link
@@ -154,7 +147,7 @@ function DashboardHeader() {
         <Button variant="ghost" size="icon" className="relative">
           <Bell className="h-4 w-4" />
           <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full text-[10px] text-white flex items-center justify-center">
-            3
+            1
           </span>
           <span className="sr-only">Notifications</span>
         </Button>
@@ -182,14 +175,14 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     if (!loading && !user) {
       router.push("/login")
-    } else if (!loading && user && user.role !== "retailer") {
+    } else if (!loading && user && user.role !== "driver") {
       // Redirect to appropriate dashboard based on role
       switch (user.role) {
         case "customer":
           router.push("/dashboard")
           break
-        case "driver":
-          router.push("/driver")
+        case "retailer":
+          router.push("/retailer")
           break
         default:
           router.push("/")
@@ -201,14 +194,14 @@ function AuthGuard({ children }: { children: React.ReactNode }) {
     return <LoadingSpinner />
   }
 
-  if (!user || user.role !== "retailer") {
+  if (!user || user.role !== "driver") {
     return <LoadingSpinner />
   }
 
   return <>{children}</>
 }
 
-export default function RetailerLayout({
+export default function DriverLayout({
   children,
 }: {
   children: React.ReactNode

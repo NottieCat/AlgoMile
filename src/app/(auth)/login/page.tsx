@@ -1,72 +1,35 @@
-"use client";
+"use client"
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useForm } from "react-hook-form";
-import { zodResolver } from "@hookform/resolvers/zod";
-import { z } from "zod";
-import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
-import { useToast } from "@/hooks/use-toast";
-import Logo from "@/components/logo";
+import Link from "next/link"
+import { useForm } from "react-hook-form"
+import { zodResolver } from "@hookform/resolvers/zod"
+import { z } from "zod"
+import { Button } from "@/components/ui/button"
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
+import { Input } from "@/components/ui/input"
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
+import { useAuth } from "@/hooks/use-auth"
+import Logo from "@/components/logo"
 
 const formSchema = z.object({
   email: z.string().email({ message: "Invalid email address." }),
   password: z.string().min(1, { message: "Password is required." }),
-});
+})
 
 export default function LoginPage() {
-  const router = useRouter();
-  const { toast } = useToast();
+  const { login } = useAuth()
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
     defaultValues: {
       email: "",
       password: "",
     },
-  });
+  })
 
   const onSubmit = async (values: z.infer<typeof formSchema>) => {
-    const response = await fetch('/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(values),
-    });
+    await login(values.email, values.password)
+  }
 
-    const data = await response.json();
-
-    if (response.ok) {
-      toast({
-        title: "Success",
-        description: "Logged in successfully!",
-      });
-
-      // Redirect based on role
-      switch (data.role) {
-        case 'customer':
-          router.push('/dashboard');
-          break;
-        case 'retailer':
-          router.push('/retailer');
-          break;
-        case 'driver':
-          router.push('/driver');
-          break;
-        default:
-          router.push('/dashboard'); // Default redirect
-      }
-      router.refresh(); // Refresh to update server-side state
-    } else {
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: data.message || "An error occurred.",
-      });
-    }
-  };
-  
   return (
     <Card className="mx-auto max-w-sm w-full">
       <CardHeader className="text-center">
@@ -95,7 +58,7 @@ export default function LoginPage() {
               name="password"
               render={({ field }) => (
                 <FormItem>
-                   <div className="flex items-center">
+                  <div className="flex items-center">
                     <FormLabel>Password</FormLabel>
                     <Link href="#" className="ml-auto inline-block text-sm underline">
                       Forgot your password?

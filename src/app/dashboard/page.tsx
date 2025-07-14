@@ -1,3 +1,5 @@
+"use client"
+
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import { DeliveryMap } from "@/components/map/delivery-map"
@@ -6,9 +8,9 @@ import Link from "next/link"
 
 const DashboardPage = () => {
   return (
-    <div className="container mx-auto py-28 px-4 md:px-6">
-      <div className="space-y-4 mb-8">
-        <h1 className="text-4xl font-bold font-headline">Customer Dashboard</h1>
+    <div className="space-y-6">
+      <div className="space-y-4">
+        <h1 className="text-4xl font-bold font-headline">Welcome to your Dashboard!</h1>
         <p className="text-muted-foreground">Manage your orders and optimize deliveries with our AI-powered routing.</p>
       </div>
 

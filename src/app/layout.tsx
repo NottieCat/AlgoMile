@@ -3,31 +3,13 @@ import type { Metadata } from "next"
 import "./globals.css"
 import { cn } from "@/lib/utils"
 import { Toaster } from "@/components/ui/toaster"
-import Header from "@/components/layout/header"
-import Footer from "@/components/layout/footer"
 import { CartProvider } from "@/hooks/use-cart"
+import { AuthProvider } from "@/hooks/use-auth"
+import { LayoutWrapper } from "@/components/layout/layout-wrapper"
 
 export const metadata: Metadata = {
   title: "AlgoMile - Dynamic Routing that Cuts Time & Cost",
   description: "AI-powered dynamic vehicle routing for warehouse-to-customer delivery.",
-}
-
-function ConditionalLayout({ children, pathname }: { children: React.ReactNode; pathname?: string }) {
-  // Don't show header/footer for retailer, driver, or other dashboard pages
-  const isDashboardPage =
-    pathname?.startsWith("/retailer") || pathname?.startsWith("/driver") || pathname?.startsWith("/dashboard")
-
-  if (isDashboardPage) {
-    return <>{children}</>
-  }
-
-  return (
-    <>
-      <Header />
-      <main className="flex-1">{children}</main>
-      <Footer />
-    </>
-  )
 }
 
 export default function RootLayout({
@@ -47,10 +29,12 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css" />
       </head>
       <body className={cn("font-body antialiased")}>
-        <CartProvider>
-          <ConditionalLayout>{children}</ConditionalLayout>
-          <Toaster />
-        </CartProvider>
+        <AuthProvider>
+          <CartProvider>
+            <LayoutWrapper>{children}</LayoutWrapper>
+            <Toaster />
+          </CartProvider>
+        </AuthProvider>
       </body>
     </html>
   )
